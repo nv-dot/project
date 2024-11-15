@@ -7,7 +7,9 @@ __pycache__/
 *.so
 
 # File not to add
-venv/
+new_venv/
+catboost_info/
+
 
 # Distribution / packaging
 .Python
