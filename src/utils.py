@@ -16,6 +16,7 @@ import scipy.sparse as sp
 from src.logger import *
 
 from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
 
 from src.exception import *
 
@@ -30,22 +31,33 @@ def save_obj(file_path,obj):
         raise logger.error(f'{e}','{sys}')
     
 
-def evaluate_models(x_train,y_train,x_test,y_test,models):
+def evaluate_models(x_train,y_train,x_test,y_test,models,params):
+
+    """The condition that i have written here will see for parameter if the parameter is not there then it 
+    will go by their base params."""
 
     try:
         report = {}
 
-        for i in range(len(list(models))):
-            model = list(models.values())[i]
+        for model_name, model in models.items():
+            model_params = params.get(model_name, {})
 
-            model.fit(x_train,y_train)
-            y_train_pred = model.predict(x_train)
-            y_test_pred = model.predict(x_test)
+            if model_params:
+                gs = GridSearchCV(model, model_params, cv=3) 
+                gs.fit(x_train, y_train)
+                best_model = gs.best_estimator_
+            else:
+                best_model = model
+                best_model.fit(x_train, y_train)
+
+            y_train_pred = best_model.predict(x_train)
+            y_test_pred = best_model.predict(x_test)
 
             train_model_score = r2_score(y_train,y_train_pred)
             test_model_score = r2_score(y_test,y_test_pred)
 
-            report[list(models.keys())[i]] = test_model_score
+            report[model_name] = test_model_score
+
 
         return report
         
