@@ -7,8 +7,8 @@ __pycache__/
 *.so
 
 # File not to add
-.artifacts
-.new_venv
+.artifacts/
+.new_venv/
 .catboost_info
 new_venv/
 catboost_info/

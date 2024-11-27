@@ -11,11 +11,14 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 
+from src.components.data_transformation import DataTransformation
+from src.components.model_trainer import trainerconfig, Modeltrainer
+
 @dataclass
 class dataingestionconfig():
     test_data_path: str=os.path.join('artifacts/test_data.csv')
     train_data_path: str=os.path.join('artifacts/train_data.csv')
-    original_data_path: str=os.path.join('artifacts/data.csv')
+    original_data_path: str=os.path.join('artifacts/data_new_.csv')
 
 class dataingestion():
     def __init__(self):
@@ -24,7 +27,7 @@ class dataingestion():
     def initiate_data_ingestion(self):
         logging.info('Entered the data ingestion method')
         try:
-            df = pd.read_csv('notebook/data/stud.csv')
+            df = pd.read_csv('notebook/data_new.csv')
             logger.info('Dataset has been read and converted into a df')
 
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path),exist_ok=True)
@@ -47,4 +50,10 @@ class dataingestion():
         
 if __name__ == '__main__':
     obj = dataingestion()
-    obj.initiate_data_ingestion()
+    train_data,test_data = obj.initiate_data_ingestion()
+
+    data_transformation = DataTransformation()
+    train_arr,test_arr,_ = data_transformation.initiate_datatransformation(train_data,test_data)
+
+    model_trainer = Modeltrainer()
+    print(model_trainer.initiate_model_training(train_arr,test_arr))
